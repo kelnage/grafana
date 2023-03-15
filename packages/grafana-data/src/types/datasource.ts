@@ -519,6 +519,7 @@ export interface DataQueryRequest<TQuery extends DataQuery = DataQuery> {
 
   // Explore state used by various datasources
   liveStreaming?: boolean;
+  materializeStream?: string;
 
   // Make it possible to hide support queries from the inspector
   hideFromInspector?: boolean;

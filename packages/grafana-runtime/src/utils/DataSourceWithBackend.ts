@@ -187,6 +187,10 @@ class DataSourceWithBackend<
       body.range = range;
       body.from = range.from.valueOf().toString();
       body.to = range.to.valueOf().toString();
+      // Only attempt to materialize a stream if it is a range query
+      if (request.materializeStream) {
+        body['materialized-name'] = request.materializeStream;
+      }
     }
 
     if (config.featureToggles.queryOverLive) {
