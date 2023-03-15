@@ -107,6 +107,15 @@ func parseSupportingQueryType(jsonPointerValue *string) (SupportingQueryType, er
 	}
 }
 
+func parseMaterializedName(jsonPointerValue *string) (string, error) {
+	if jsonPointerValue == nil {
+		return "", nil
+	} else {
+		jsonValue := *jsonPointerValue
+		return jsonValue, nil
+	}
+}
+
 func parseQuery(queryContext *backend.QueryDataRequest) ([]*lokiQuery, error) {
 	qs := []*lokiQuery{}
 	for _, query := range queryContext.Queries {
@@ -155,6 +164,11 @@ func parseQuery(queryContext *backend.QueryDataRequest) ([]*lokiQuery, error) {
 			return nil, err
 		}
 
+		materializedName, err := parseMaterializedName(model.MaterializedName)
+		if err != nil {
+			return nil, err
+		}
+
 		qs = append(qs, &lokiQuery{
 			Expr:                expr,
 			QueryType:           queryType,
@@ -166,6 +180,7 @@ func parseQuery(queryContext *backend.QueryDataRequest) ([]*lokiQuery, error) {
 			End:                 end,
 			RefID:               query.RefID,
 			SupportingQueryType: supportingQueryType,
+			MaterializedName:    materializedName,
 		})
 	}
 

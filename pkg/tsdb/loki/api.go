@@ -81,6 +81,10 @@ func makeDataRequest(ctx context.Context, lokiDsUrl string, query lokiQuery) (*h
 		return nil, fmt.Errorf("invalid QueryType: %v", query.QueryType)
 	}
 
+	if query.MaterializedName != "" {
+		qs.Set("materialized-name", query.MaterializedName)
+	}
+
 	lokiUrl.RawQuery = qs.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", lokiUrl.String(), nil)

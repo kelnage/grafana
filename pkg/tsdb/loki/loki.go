@@ -61,6 +61,7 @@ type QueryJSONModel struct {
 	dataquery.LokiDataQuery
 	Direction           *string `json:"direction,omitempty"`
 	SupportingQueryType *string `json:"supportingQueryType"`
+	MaterializedName    *string `json:"materialized-name,omitempty"`
 }
 
 func parseQueryModel(raw json.RawMessage) (*QueryJSONModel, error) {

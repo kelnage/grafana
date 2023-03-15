@@ -38,4 +38,5 @@ type lokiQuery struct {
 	End                 time.Time
 	RefID               string
 	SupportingQueryType SupportingQueryType
+	MaterializedName    string
 }
