@@ -32,6 +32,10 @@ export interface ValuePickerProps<T> {
   menuPlacement?: 'auto' | 'bottom' | 'top';
   /** Which ButtonFill to use */
   fill?: ButtonFill;
+  /** Should the picker allow custom values */
+  allowCustomValue?: boolean;
+  /** Callback to handle the creation of a value */
+  onCreateOption?: (value: string) => void;
 
   /** custom css applied to the button */
   buttonCss?: string;
@@ -49,6 +53,8 @@ export function ValuePicker<T>({
   isFullWidth = true,
   menuPlacement,
   fill,
+  allowCustomValue = false,
+  onCreateOption,
   buttonCss,
 }: ValuePickerProps<T>) {
   const [isPicking, setIsPicking] = useState(false);
@@ -84,6 +90,8 @@ export function ValuePicker<T>({
               setIsPicking(false);
               onChange(value);
             }}
+            allowCustomValue={allowCustomValue}
+            onCreateOption={onCreateOption}
             menuPlacement={menuPlacement}
           />
         </span>
