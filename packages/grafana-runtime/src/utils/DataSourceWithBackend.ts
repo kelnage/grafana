@@ -166,6 +166,11 @@ class DataSourceWithBackend<
       if (datasource.uid?.length) {
         dsUIDs.add(datasource.uid);
       }
+      // Only attempt to materialize a stream if it is a range query and not a supporting query
+      let materializedStream = undefined;
+      if (request.materializeStream && q.queryType === 'range' && !('supportingQueryType' in q)) {
+        materializedStream = request.materializeStream;
+      }
       return {
         ...(shouldApplyTemplateVariables ? this.applyTemplateVariables(q, request.scopedVars) : q),
         datasource,
@@ -173,6 +178,7 @@ class DataSourceWithBackend<
         intervalMs,
         maxDataPoints,
         queryCachingTTL,
+        'materialized-name': materializedStream,
       };
     });
 
@@ -180,17 +186,12 @@ class DataSourceWithBackend<
     if (!queries.length) {
       return of({ data: [] });
     }
-
     const body: any = { queries };
 
     if (range) {
       body.range = range;
       body.from = range.from.valueOf().toString();
       body.to = range.to.valueOf().toString();
-      // Only attempt to materialize a stream if it is a range query
-      if (request.materializeStream) {
-        body['materialized-name'] = request.materializeStream;
-      }
     }
 
     if (config.featureToggles.queryOverLive) {
