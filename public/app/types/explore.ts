@@ -171,6 +171,11 @@ export interface ExploreItemState {
   isLive: boolean;
 
   /**
+   * If set, the name of the stream being materialized.
+   */
+  materializedStream?: string;
+
+  /**
    * If true, the live tailing view is paused.
    */
   isPaused: boolean;
@@ -225,6 +230,7 @@ export interface QueryOptions {
   minInterval?: string;
   maxDataPoints?: number;
   liveStreaming?: boolean;
+  materializeStream?: string;
 }
 
 export interface QueryTransaction {

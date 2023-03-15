@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 import React, { lazy, PureComponent, RefObject, Suspense } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { DataSourceInstanceSettings, RawTimeRange } from '@grafana/data';
+import { DataSourceInstanceSettings, RawTimeRange, SelectableValue } from '@grafana/data';
 import { config, DataSourcePicker, reportInteraction } from '@grafana/runtime';
 import { defaultIntervals, PageToolbar, RefreshPicker, SetInterval, ToolbarButton, ButtonGroup } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
@@ -19,9 +19,10 @@ import { getFiscalYearStartMonth, getTimeZone } from '../profile/state/selectors
 
 import { ExploreTimeControls } from './ExploreTimeControls';
 import { LiveTailButton } from './LiveTailButton';
+import MaterializeButton from './MaterializeButton';
 import { changeDatasource } from './state/datasource';
 import { splitClose, splitOpen, maximizePaneAction, evenPaneResizeAction } from './state/main';
-import { cancelQueries, runQueries } from './state/query';
+import { cancelQueries, runQueries, setMaterializedStreamName } from './state/query';
 import { isSplit } from './state/selectors';
 import { syncTimes, changeRefreshInterval } from './state/time';
 import { LiveTailControls } from './useLiveTailControls';
@@ -93,6 +94,19 @@ class UnConnectedExploreToolbar extends PureComponent<Props> {
     reportInteraction('grafana_explore_split_view_closed');
   };
 
+  onChangeMaterializedStream = (materializedStream: SelectableValue<string> | string | undefined) => {
+    const { setMaterializedStreamName, exploreId } = this.props;
+    let streamName = undefined;
+    if (materializedStream) {
+      if (typeof materializedStream === 'string') {
+        streamName = materializedStream;
+      } else {
+        streamName = materializedStream.value;
+      }
+    }
+    setMaterializedStreamName(exploreId, streamName);
+  };
+
   renderRefreshPicker = (showSmallTimePicker: boolean) => {
     const { loading, refreshInterval, isLive } = this.props;
 
@@ -137,6 +151,7 @@ class UnConnectedExploreToolbar extends PureComponent<Props> {
       onChangeFiscalYearStartMonth,
       isPaused,
       hasLiveOption,
+      hasMaterializeOption,
       containerWidth,
       largerExploreId,
     } = this.props;
@@ -204,6 +219,17 @@ class UnConnectedExploreToolbar extends PureComponent<Props> {
           hideText={showSmallTimePicker}
           onChangeTimeZone={onChangeTimeZone}
           onChangeFiscalYearStartMonth={onChangeFiscalYearStartMonth}
+        />
+      ),
+
+      !isLive && hasMaterializeOption && (
+        <MaterializeButton
+          key="materialize"
+          defaultText="Materialize"
+          selectedText="MS"
+          icon="database"
+          onChange={this.onChangeMaterializedStream}
+          onCreateOption={this.onChangeMaterializedStream}
         />
       ),
 
@@ -301,6 +327,7 @@ const mapStateToProps = (state: StoreState, { exploreId }: OwnProps) => {
     exploreItem;
 
   const hasLiveOption = !!datasourceInstance?.meta?.streaming;
+  const hasMaterializeOption = datasourceInstance?.type === 'loki';
 
   return {
     datasourceMissing,
@@ -313,6 +340,7 @@ const mapStateToProps = (state: StoreState, { exploreId }: OwnProps) => {
     splitted: isSplit(state),
     refreshInterval,
     hasLiveOption,
+    hasMaterializeOption,
     isLive,
     isPaused,
     syncedTimes,
@@ -329,6 +357,7 @@ const mapDispatchToProps = {
   closeSplit: splitClose,
   split: splitOpen,
   syncTimes,
+  setMaterializedStreamName,
   onChangeTimeZone: updateTimeZoneForSession,
   onChangeFiscalYearStartMonth: updateFiscalYearStartMonthForSession,
   maximizePaneAction,

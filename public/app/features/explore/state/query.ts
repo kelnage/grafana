@@ -220,6 +220,30 @@ export interface ClearCachePayload {
 }
 export const clearCacheAction = createAction<ClearCachePayload>('explore/clearCache');
 
+export interface StoreMaterializedStreamName {
+  exploreId: ExploreId;
+  materializedStream: string | undefined;
+}
+
+/**
+ * Stores the name of the stream to be materialized
+ */
+export const setMaterializedStreamNameAction = createAction<StoreMaterializedStreamName>(
+  'expore/setMaterializedStreamName'
+);
+
+export function setMaterializedStreamName(
+  exploreId: ExploreId,
+  materializedStream: string | undefined
+): ThunkResult<void> {
+  return async (dispatch, getState) => {
+    // const oldMaterializedStream = getState().explore[exploreId]!.materializedStream;
+
+    dispatch(setMaterializedStreamNameAction({ exploreId, materializedStream }));
+    dispatch(stateSave());
+  };
+}
+
 //
 // Action creators
 //
@@ -471,6 +495,7 @@ export const runQueries = (
       datasourceInstance,
       containerWidth,
       isLive: live,
+      materializedStream: materialize,
       range,
       scanning,
       queryResponse,
@@ -539,6 +564,7 @@ export const runQueries = (
         // maxDataPoints: mode === ExploreMode.Logs && datasourceId === 'loki' ? undefined : containerWidth,
         maxDataPoints: containerWidth,
         liveStreaming: live,
+        materializeStream: materialize,
       };
 
       const timeZone = getTimeZone(getState().user);
@@ -1030,6 +1056,13 @@ export const queryReducer = (state: ExploreItemState, action: AnyAction): Explor
     return {
       ...state,
       cache: [],
+    };
+  }
+
+  if (setMaterializedStreamNameAction.match(action)) {
+    return {
+      ...state,
+      materializedStream: action.payload.materializedStream,
     };
   }
 

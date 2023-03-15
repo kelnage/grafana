@@ -161,6 +161,7 @@ export function buildQueryTransaction(
     },
     maxDataPoints: queryOptions.maxDataPoints,
     liveStreaming: queryOptions.liveStreaming,
+    materializeStream: queryOptions.materializeStream,
   };
 
   return {
