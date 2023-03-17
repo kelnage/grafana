@@ -28,7 +28,6 @@ export default function MaterializeButton({
     {
       title: 'Disable materialized stream',
       label: 'Disable',
-      ariaLabel: 'Disable materialized stream',
     },
   ]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(defaultSelection);
@@ -39,7 +38,6 @@ export default function MaterializeButton({
         {
           title: 'Disable materialized stream',
           label: 'Disable',
-          ariaLabel: 'Disable materialized stream',
         },
         ...options,
       ]);
