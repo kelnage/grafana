@@ -152,6 +152,7 @@ class UnConnectedExploreToolbar extends PureComponent<Props> {
       isPaused,
       hasLiveOption,
       hasMaterializeOption,
+      fetchMaterializedNames,
       containerWidth,
       largerExploreId,
     } = this.props;
@@ -230,6 +231,7 @@ class UnConnectedExploreToolbar extends PureComponent<Props> {
           icon="database"
           onChange={this.onChangeMaterializedStream}
           onCreateOption={this.onChangeMaterializedStream}
+          fetchOptions={fetchMaterializedNames}
         />
       ),
 
@@ -328,6 +330,19 @@ const mapStateToProps = (state: StoreState, { exploreId }: OwnProps) => {
 
   const hasLiveOption = !!datasourceInstance?.meta?.streaming;
   const hasMaterializeOption = datasourceInstance?.type === 'loki';
+  const fetchMaterializedNames = async () => {
+    const provider = datasourceInstance?.languageProvider;
+    if (provider) {
+      await provider.fetchLabels();
+      const values: string[] = await provider.getLabelValues('__materialized__');
+      return values.map((name) => ({
+        label: name,
+        value: name,
+        title: `Append to the materialized stream ${name}`,
+      }));
+    }
+    return [];
+  };
 
   return {
     datasourceMissing,
@@ -341,6 +356,7 @@ const mapStateToProps = (state: StoreState, { exploreId }: OwnProps) => {
     refreshInterval,
     hasLiveOption,
     hasMaterializeOption,
+    fetchMaterializedNames,
     isLive,
     isPaused,
     syncedTimes,

@@ -26,8 +26,8 @@ export default function MaterializeButton({
 }: Props) {
   const [streamNames, setStreamNames] = useState<Array<SelectableValue<string>>>([
     {
-      title: 'Disable',
-      description: 'Disable',
+      title: 'Disable materialized stream',
+      label: 'Disable',
       ariaLabel: 'Disable materialized stream',
     },
   ]);
@@ -37,8 +37,8 @@ export default function MaterializeButton({
     fetchOptions?.().then((options) => {
       setStreamNames([
         {
-          title: 'Disable',
-          description: 'Disable',
+          title: 'Disable materialized stream',
+          label: 'Disable',
           ariaLabel: 'Disable materialized stream',
         },
         ...options,
